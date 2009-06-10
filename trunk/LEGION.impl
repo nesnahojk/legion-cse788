@@ -1,0 +1,211 @@
+
+template <class Ex, class In>
+void LEGION<Ex,In>::Runge_Kutta(double x1, double y1, double &x2, double &y2, double input, double h)
+    {
+        double kx1, kx2, kx3, kx4, ky1, ky2, ky3, ky4;
+	kx1 = h * ff(x1, y1, input);
+	ky1 = h * gg(x1, y1);
+
+	kx2 = h * ff(x1 + kx1 / 2.0, y1 + ky1 / 2.0, input);
+	ky2 = h * gg(x1 + kx1 / 2.0, y1 + ky1 / 2.0);
+
+	kx3 = h * ff(x1 + kx2 / 2.0, y1 + ky2 / 2.0, input);
+	ky3 = h * gg(x1 + kx2 / 2.0, y1 + ky2 / 2.0);
+
+	kx4 = h * ff(x1 + kx3, y1 + ky3, input);
+	ky4 = h * gg(x1 + kx3, y1 + ky3);
+
+
+        x2 = x1 + (kx1 + 2.0 * kx2 + 2.0 * kx3 + kx4) / 6.0;
+        y2 = y1 + (ky1 + 2.0 * ky2 + 2.0 * ky3 + ky4) / 6.0;
+
+    }
+
+
+template <class Ex, class In>
+double LEGION<Ex,In>::S_Inf(double x, double theta)
+{
+    return (1 / (1 + exp(-1 * K * (x - theta))));
+}
+
+
+template <class Ex, class In>
+double LEGION<Ex,In>::Sigma_Inf()
+{
+    for (int i = 1; i <= N; i++)
+    {
+        for (int j = 1; j <= N; j++)
+        {
+            if (legion_nodes[i][j].x > theta_zx)
+            {
+                return 1.0;
+            }
+        }
+    }
+    return 0.0;
+}
+
+template <class Ex, class In>
+LEGION<Ex,In>::LEGION()
+{
+    z = 0.0;
+    legion_nodes = new Node*[N + 2];
+    for (int i = 0; i < (N + 2); i++)
+    {
+        legion_nodes[i] = new Node[N + 2];
+    }
+}
+
+template <class Ex, class In>
+double LEGION<Ex,In>::Gauss_Noise()
+{
+    double x1, x2;
+    x1 = .5 + Rand_Range(1, 2) / 2.0;
+    x2 = .5 + Rand_Range(1, 2) / 2.0;
+    return (rho * (4 * x1 * (1 - x2) - 0.5));
+}
+
+template <class Ex, class In>
+double LEGION<Ex,In>::Rand_Range(double a, double b)
+{
+    return a + (b - a)*((double) rand() / (double) RAND_MAX);
+}
+
+template <class Ex, class In>
+void LEGION<Ex,In>::Init_Weights(double WEIGHT_NORM, double global)
+{
+    for (int i = 1; i <= N; i++)
+    {
+        for (int j = 1; j <= N; j++)
+        {
+            legion_nodes[i][j].weights[4] = global;
+            if (legion_nodes[i][j].I > 0)
+            {
+                int cc = 0;
+                if (legion_nodes[i - 1][j].I > 0)
+                {
+                    cc++;
+                }
+                if (legion_nodes[i + 1][j].I > 0)
+                {
+                    cc++;
+                }
+                if (legion_nodes[i][j - 1].I > 0)
+                {
+                    cc++;
+                }
+                if (legion_nodes[i][j + 1].I > 0)
+                {
+                    cc++;
+                }
+
+                if (cc > 0)
+                {
+                    if (legion_nodes[i][j - 1].I > 0) legion_nodes[i][j].weights[0] = WEIGHT_NORM / cc;
+                    if (legion_nodes[i - 1][j].I > 0) legion_nodes[i][j].weights[1] = WEIGHT_NORM / cc;
+                    if (legion_nodes[i][j + 1].I > 0) legion_nodes[i][j].weights[2] = WEIGHT_NORM / cc;
+                    if (legion_nodes[i + 1][j].I > 0) legion_nodes[i][j].weights[3] = WEIGHT_NORM / cc;
+                }
+            }
+        }
+    }
+}
+
+template <class Ex, class In>
+void LEGION<Ex,In>::Iteration(double h)
+{
+    double tempX, tempY, s_i;
+
+    for (int i = 1; i <= N; i++)
+    {
+        for (int j = 1; j <= N; j++)
+        {
+            s_i = 0.0;
+
+            //add in the neighbor coupling term
+            if (i - 1 > 0)
+            {
+                s_i += legion_nodes[i][j].weights[1] * S_Inf(legion_nodes[i - 1][j].x, theta_x);
+            }
+            if (i + 1 <= N)
+            {
+                s_i += legion_nodes[i][j].weights[3] * S_Inf(legion_nodes[i + 1][j].x, theta_x);
+            }
+            if (j - 1 > 0)
+            {
+                s_i += legion_nodes[i][j].weights[0] * S_Inf(legion_nodes[i][j - 1].x, theta_x);
+            }
+            if (j + 1 <= N)
+            {
+                s_i += legion_nodes[i][j].weights[2] * S_Inf(legion_nodes[i][j + 1].x, theta_x);
+            }
+
+            s_i += legion_nodes[i][j].I + Gauss_Noise() - legion_nodes[i][j].weights[4] * S_Inf(z, 0.1); //add in the noise and global inhib coupling
+
+            //solve the dynamical system
+	    Runge_Kutta(legion_nodes[i][j].x, legion_nodes[i][j].y, tempX, tempY, s_i, h);
+            legion_nodes[i][j].x = tempX;
+            legion_nodes[i][j].y = tempY;
+        }
+    }
+    //solve for the new inhibit term
+    double sig_inf = Sigma_Inf();
+
+    double k1 = h * Z_Prime(z, sig_inf);
+    double k2 = h * Z_Prime(z + k1 / 2.0, sig_inf);
+    double k3 = h * Z_Prime(z + k2 / 2.0, sig_inf);
+    double k4 = h * Z_Prime(z + k3, sig_inf);
+    z += (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0;
+}
+
+template <class Ex, class In>
+double LEGION<Ex,In>::Z_Prime(double x, double input)
+{
+    return (phi * (input - x));
+}
+
+template <class Ex, class In>
+    double LEGION<Ex,In>::Max_X_Grid(Node ** a)
+    {
+        double max = a[1][1].x;
+        for (int i = 1; i <=N; i++)
+        {
+            for (int j = 1; j <=N; j++)
+            {
+                if (a[i][j].x > max)
+                {
+                    max = a[i][j].x;
+                }
+            }
+        }
+        return max;
+    }
+
+template<class Ex,class In>
+  void LEGION<Ex,In>::Reset(double x1,double x2, double x3, double x4)
+{
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= N; j++) {
+            legion_nodes[i][j].x = Rand_Range(x1, x2);
+            legion_nodes[i][j].y = Rand_Range(x3, x4);
+        }
+    }
+}
+
+template <class Ex, class In>
+    double LEGION<Ex,In>::Min_X_Grid(Node ** a)
+    {
+        double min = a[1][1].x;
+        for (int i = 1; i <=N; i++)
+        {
+            for (int j = 1; j <=N; j++)
+            {
+                if (a[i][j].x < min)
+                {
+                    min = a[i][j].x;
+                }
+            }
+        }
+        return min;
+    }
+
