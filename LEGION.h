@@ -13,6 +13,19 @@
 
 
 
+class Z_Prime
+{
+ private:
+  static const double phi = 3.0;
+ public:
+  double operator ()(double x, double input)
+  {
+    return (phi * (input - x));
+  }
+};
+
+
+
 class ExcitatoryUnit
 {
  public:
@@ -51,7 +64,7 @@ struct Node
 };
 
 
-template <class Ex=ExcitatoryUnit, class In=InhibitoryUnit>
+template <class Ex=ExcitatoryUnit, class In=InhibitoryUnit, class Zp=Z_Prime>
 class LEGION
 {
 
@@ -72,11 +85,11 @@ static const double K = 50.0;
 static const double theta_x = .5;
 static const double theta_zx = .1;
 static const double theta_xz = .1;
-static const double phi = 3.0;
 static const double rho = .02;
 
 Ex ff;
 In gg;
+Zp zz;
 
     double S_Inf(double x, double theta);
     double Gauss_Noise();
