@@ -93,7 +93,6 @@ Zp zz;
 
     double S_Inf(double x, double theta);
     double Gauss_Noise();
-    double Z_Prime(double x, double input);
     double Sigma_Inf();
     void Runge_Kutta(double x1, double y1, double &x2, double &y2, double input, double h);
 
