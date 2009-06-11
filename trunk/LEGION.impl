@@ -1,6 +1,6 @@
-
-template <class Ex, class In>
-void LEGION<Ex,In>::Runge_Kutta(double x1, double y1, double &x2, double &y2, double input, double h)
+	
+template <class Ex, class In, class Zp>
+void LEGION<Ex,In,Zp>::Runge_Kutta(double x1, double y1, double &x2, double &y2, double input, double h)
     {
         double kx1, kx2, kx3, kx4, ky1, ky2, ky3, ky4;
 	kx1 = h * ff(x1, y1, input);
@@ -22,15 +22,15 @@ void LEGION<Ex,In>::Runge_Kutta(double x1, double y1, double &x2, double &y2, do
     }
 
 
-template <class Ex, class In>
-double LEGION<Ex,In>::S_Inf(double x, double theta)
+template <class Ex, class In, class Zp>
+double LEGION<Ex,In,Zp>::S_Inf(double x, double theta)
 {
     return (1 / (1 + exp(-1 * K * (x - theta))));
 }
 
 
-template <class Ex, class In>
-double LEGION<Ex,In>::Sigma_Inf()
+template <class Ex, class In, class Zp>
+double LEGION<Ex,In,Zp>::Sigma_Inf()
 {
     for (int i = 1; i <= N; i++)
     {
@@ -45,8 +45,8 @@ double LEGION<Ex,In>::Sigma_Inf()
     return 0.0;
 }
 
-template <class Ex, class In>
-LEGION<Ex,In>::LEGION()
+template <class Ex, class In, class Zp>
+LEGION<Ex,In,Zp>::LEGION()
 {
     z = 0.0;
     legion_nodes = new Node*[N + 2];
@@ -56,8 +56,8 @@ LEGION<Ex,In>::LEGION()
     }
 }
 
-template <class Ex, class In>
-double LEGION<Ex,In>::Gauss_Noise()
+template <class Ex, class In,class Zp>
+double LEGION<Ex,In,Zp>::Gauss_Noise()
 {
     double x1, x2;
     x1 = .5 + Rand_Range(1, 2) / 2.0;
@@ -65,14 +65,14 @@ double LEGION<Ex,In>::Gauss_Noise()
     return (rho * (4 * x1 * (1 - x2) - 0.5));
 }
 
-template <class Ex, class In>
-double LEGION<Ex,In>::Rand_Range(double a, double b)
+template <class Ex, class In,class Zp>
+double LEGION<Ex,In,Zp>::Rand_Range(double a, double b)
 {
     return a + (b - a)*((double) rand() / (double) RAND_MAX);
 }
 
-template <class Ex, class In>
-void LEGION<Ex,In>::Init_Weights(double WEIGHT_NORM, double global)
+template <class Ex, class In,class Zp>
+void LEGION<Ex,In,Zp>::Init_Weights(double WEIGHT_NORM, double global)
 {
     for (int i = 1; i <= N; i++)
     {
@@ -111,8 +111,8 @@ void LEGION<Ex,In>::Init_Weights(double WEIGHT_NORM, double global)
     }
 }
 
-template <class Ex, class In>
-void LEGION<Ex,In>::Iteration(double h)
+template <class Ex, class In,class Zp>
+void LEGION<Ex,In,Zp>::Iteration(double h)
 {
     double tempX, tempY, s_i;
 
@@ -151,21 +151,16 @@ void LEGION<Ex,In>::Iteration(double h)
     //solve for the new inhibit term
     double sig_inf = Sigma_Inf();
 
-    double k1 = h * Z_Prime(z, sig_inf);
-    double k2 = h * Z_Prime(z + k1 / 2.0, sig_inf);
-    double k3 = h * Z_Prime(z + k2 / 2.0, sig_inf);
-    double k4 = h * Z_Prime(z + k3, sig_inf);
+    double k1 = h * zz(z, sig_inf);
+    double k2 = h * zz(z + k1 / 2.0, sig_inf);
+    double k3 = h * zz(z + k2 / 2.0, sig_inf);
+    double k4 = h * zz(z + k3, sig_inf);
     z += (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0;
 }
 
-template <class Ex, class In>
-double LEGION<Ex,In>::Z_Prime(double x, double input)
-{
-    return (phi * (input - x));
-}
 
-template <class Ex, class In>
-    double LEGION<Ex,In>::Max_X_Grid(Node ** a)
+template <class Ex, class In,class Zp>
+    double LEGION<Ex,In,Zp>::Max_X_Grid(Node ** a)
     {
         double max = a[1][1].x;
         for (int i = 1; i <=N; i++)
@@ -181,8 +176,8 @@ template <class Ex, class In>
         return max;
     }
 
-template<class Ex,class In>
-  void LEGION<Ex,In>::Reset(double x1,double x2, double x3, double x4)
+template<class Ex,class In,class Zp>
+  void LEGION<Ex,In,Zp>::Reset(double x1,double x2, double x3, double x4)
 {
     for (int i = 1; i <= N; i++) {
         for (int j = 1; j <= N; j++) {
@@ -192,8 +187,8 @@ template<class Ex,class In>
     }
 }
 
-template <class Ex, class In>
-    double LEGION<Ex,In>::Min_X_Grid(Node ** a)
+template <class Ex, class In,class Zp>
+    double LEGION<Ex,In,Zp>::Min_X_Grid(Node ** a)
     {
         double min = a[1][1].x;
         for (int i = 1; i <=N; i++)
