@@ -1,4 +1,4 @@
-	
+//One iteration of the Runge kutta method
 template <class Ex, class In, class Zp>
 void LEGION<Ex,In,Zp>::Runge_Kutta(double x1, double y1, double &x2, double &y2, double input, double h)
     {
@@ -20,6 +20,7 @@ void LEGION<Ex,In,Zp>::Runge_Kutta(double x1, double y1, double &x2, double &y2,
         y2 = y1 + (ky1 + 2.0 * ky2 + 2.0 * ky3 + ky4) / 6.0;
 
     }
+
 
 
 template <class Ex, class In, class Zp>
@@ -45,16 +46,19 @@ double LEGION<Ex,In,Zp>::Sigma_Inf()
     return 0.0;
 }
 
+
 template <class Ex, class In, class Zp>
 LEGION<Ex,In,Zp>::LEGION()
 {
     z = 0.0;
-    legion_nodes = new Node*[N + 2];
+    legion_nodes = new Node*[N + 2]; //pad the array for easier calcs on border
     for (int i = 0; i < (N + 2); i++)
     {
-        legion_nodes[i] = new Node[N + 2];
+      legion_nodes[i] = new Node[N + 2];  
     }
 }
+
+
 
 template <class Ex, class In,class Zp>
 double LEGION<Ex,In,Zp>::Gauss_Noise()
@@ -65,12 +69,16 @@ double LEGION<Ex,In,Zp>::Gauss_Noise()
     return (rho * (4 * x1 * (1 - x2) - 0.5));
 }
 
+
+
 template <class Ex, class In,class Zp>
 double LEGION<Ex,In,Zp>::Rand_Range(double a, double b)
 {
     return a + (b - a)*((double) rand() / (double) RAND_MAX);
 }
 
+
+//Setup the dynamically normalized synaptic connections
 template <class Ex, class In,class Zp>
 void LEGION<Ex,In,Zp>::Init_Weights(double WEIGHT_NORM, double global)
 {
@@ -111,6 +119,8 @@ void LEGION<Ex,In,Zp>::Init_Weights(double WEIGHT_NORM, double global)
     }
 }
 
+
+//One time step of size h through the system
 template <class Ex, class In,class Zp>
 void LEGION<Ex,In,Zp>::Iteration(double h)
 {
@@ -122,7 +132,7 @@ void LEGION<Ex,In,Zp>::Iteration(double h)
         {
             s_i = 0.0;
 
-            //add in the neighbor coupling term
+            //add in the neighbor terms
             if (i - 1 > 0)
             {
                 s_i += legion_nodes[i][j].weights[1] * S_Inf(legion_nodes[i - 1][j].x, theta_x);
@@ -140,17 +150,18 @@ void LEGION<Ex,In,Zp>::Iteration(double h)
                 s_i += legion_nodes[i][j].weights[2] * S_Inf(legion_nodes[i][j + 1].x, theta_x);
             }
 
-            s_i += legion_nodes[i][j].I + Gauss_Noise() - legion_nodes[i][j].weights[4] * S_Inf(z, 0.1); //add in the noise and global inhib coupling
+	    //add in the noise and global inhib coupling
+            s_i += legion_nodes[i][j].I + Gauss_Noise() - legion_nodes[i][j].weights[4] * S_Inf(z, 0.1); 
 
-            //solve the dynamical system
+            //solve the dynamical system and update the nodes
 	    Runge_Kutta(legion_nodes[i][j].x, legion_nodes[i][j].y, tempX, tempY, s_i, h);
             legion_nodes[i][j].x = tempX;
             legion_nodes[i][j].y = tempY;
         }
     }
-    //solve for the new inhibit term
-    double sig_inf = Sigma_Inf();
 
+    //solve for the new inhibitory term
+    double sig_inf = Sigma_Inf();
     double k1 = h * zz(z, sig_inf);
     double k2 = h * zz(z + k1 / 2.0, sig_inf);
     double k3 = h * zz(z + k2 / 2.0, sig_inf);
