@@ -23,6 +23,7 @@ using namespace std;
 LEGION<> OHIO_LEGION;
 bool draw = false;
 
+
 void KeyboardFunc(unsigned char key, int x, int y) {
     if (key == ' ') {
         draw = !draw;
@@ -44,7 +45,6 @@ void processSpecialKeys(int key, int x, int y) {
 
 
 // Initialize OpenGL's rendering modes
-
 void initRendering() {
     glEnable(GL_DEPTH_TEST);
 
@@ -98,9 +98,9 @@ void drawLEGION() {
     glutSwapBuffers();
 }
 
+
 void loop() {
     if (draw == true) {
-        //    usleep(10000);
         OHIO_LEGION.Iteration(.2);
         glutPostRedisplay();
         glutSwapBuffers();
@@ -117,7 +117,10 @@ int main(int argc, char *argv[]) {
     if (getline(cin, s) != NULL) {
         for (int i = 1; i <= OHIO_LEGION.N; i++) {
             for (int j = 1; j <= OHIO_LEGION.N; j++) {
+                //take the input from stdin and put into legion inputs
                 OHIO_LEGION.legion_nodes[i][j].I = (s[(j - 1) * OHIO_LEGION.N + i - 1] - '0')*.22 - .02;
+                
+                //give a random range to start
                 OHIO_LEGION.legion_nodes[i][j].x = OHIO_LEGION.Rand_Range(0, 1);
                 OHIO_LEGION.legion_nodes[i][j].y = OHIO_LEGION.Rand_Range(0, 1);
             }
@@ -133,15 +136,16 @@ int main(int argc, char *argv[]) {
 
     glutInitWindowPosition(20, 60);
     glutInitWindowSize(720, 720);
-    glutCreateWindow("");
+    glutCreateWindow("LEGION");
 
     initRendering();
+
     glutKeyboardFunc(KeyboardFunc);
     glutSpecialFunc(processSpecialKeys);
 
     glutDisplayFunc(drawLEGION);
-    glutIdleFunc(loop);
 
+    glutIdleFunc(loop);
     glutMainLoop();
 
     return (0);
