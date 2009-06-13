@@ -11,7 +11,7 @@
 #include <sstream>
 #include <iostream>
 
-
+//--Default functions defined in paper --------
 
 class Z_Prime
 {
@@ -48,7 +48,10 @@ class InhibitoryUnit
   }
 };
 
+//--End Defaults----------------------------------
 
+
+//A single neuron
 struct Node
 {
     double* weights;
@@ -64,41 +67,45 @@ struct Node
 };
 
 
-template <class Ex=ExcitatoryUnit, class In=InhibitoryUnit, class Zp=Z_Prime>
+
+template <class Ex=ExcitatoryUnit, class In=InhibitoryUnit, class Zp=Z_Prime> //set the default values
 class LEGION
 {
 
 public:
-double z;
-static const int N = 20;
-Node ** legion_nodes;
-void Init_Weights(double, double);
-LEGION();
-void Iteration(double);
-double Max_X_Grid(Node ** a);
-double Min_X_Grid(Node ** a);
-double Rand_Range(double a, double b);
-void Reset(double,double,double,double);
+ double z;
+ static const int N = 20;
+ Node ** legion_nodes;
+ void Init_Weights(double, double);
+ LEGION();
+ void Iteration(double);
+ double Max_X_Grid(Node ** a);
+ double Min_X_Grid(Node ** a);
+ double Rand_Range(double a, double b);
+ void Reset(double,double,double,double);
 
 private:
-static const double K = 50.0;
-static const double theta_x = .5;
-static const double theta_zx = .1;
-static const double theta_xz = .1;
-static const double rho = .02;
+ static const double K = 50.0;
+ static const double theta_x = .5;
+ static const double theta_zx = .1;
+ static const double theta_xz = .1;
+ static const double rho = .02;
 
-Ex ff;
-In gg;
-Zp zz;
+ Ex ff;
+ In gg;
+ Zp zz;
 
-    double S_Inf(double x, double theta);
-    double Gauss_Noise();
-    double Sigma_Inf();
-    void Runge_Kutta(double x1, double y1, double &x2, double &y2, double input, double h);
+ double S_Inf(double x, double theta);
+ double Gauss_Noise();
+ double Sigma_Inf();
+ void Runge_Kutta(double x1, double y1, double &x2, double &y2, double input, double h);
 
 
 };
 
+
+
+//include the function implementations
 
 #include "LEGION.impl"
 
