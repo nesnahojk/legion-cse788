@@ -78,12 +78,13 @@ public:
  Node ** legion_nodes;
  void Init_Weights(double, double);
  LEGION();
+~LEGION();
  void Iteration(double);
  double Max_X_Grid(Node ** a);
  double Min_X_Grid(Node ** a);
  double Rand_Range(double a, double b);
  void Reset(double,double,double,double);
-
+ 
 private:
  static const double K = 50.0;
  static const double theta_x = .5;
