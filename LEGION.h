@@ -76,11 +76,11 @@ public:
  double z;
  Node ** legion_nodes;
  void Init_Weights(double, double);
- LEGION(int);
+ LEGION(int); 
 ~LEGION();
  void Iteration(double);
- double Max_X_Grid(Node ** a);
- double Min_X_Grid(Node ** a);
+ double Max_X_Grid();
+ double Min_X_Grid();
  double Rand_Range(double a, double b);
  void Reset(double,double,double,double);
  int N;

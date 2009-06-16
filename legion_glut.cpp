@@ -20,7 +20,7 @@
 
 using namespace std;
 
-LEGION<> * OHIO_LEGION;
+LEGION<> *  OHIO_LEGION;
 bool draw = false;
 
 
@@ -60,8 +60,8 @@ void initRendering() {
 }
 
 void drawLEGION() {
-    double max = OHIO_LEGION->Max_X_Grid(OHIO_LEGION->legion_nodes);
-    double min = OHIO_LEGION->Min_X_Grid(OHIO_LEGION->legion_nodes);
+    double max = OHIO_LEGION->Max_X_Grid();
+    double min = OHIO_LEGION->Min_X_Grid();
 
     glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -115,6 +115,7 @@ int main(int argc, char *argv[]) {
     string s;
     getline(cin,s);
 
+
     OHIO_LEGION=new LEGION<>(atoi(s.c_str()));
 
     
@@ -125,11 +126,11 @@ int main(int argc, char *argv[]) {
         for (int i = 1; i <= OHIO_LEGION->N; i++) {
             for (int j = 1; j <= OHIO_LEGION->N; j++) {
                 //take the input from stdin and put into legion inputs
-                OHIO_LEGION->legion_nodes[i][j].I = (s[(j - 1) * OHIO_LEGION->N + i - 1] - '0')*.22 - .02;
+	      OHIO_LEGION->legion_nodes[i][j].I = (s[(j - 1) * OHIO_LEGION->N + i - 1] - '0')*.22 - .02;
                 
                 //give a random range to start
-                OHIO_LEGION->legion_nodes[i][j].x = OHIO_LEGION->Rand_Range(0, 1);
-                OHIO_LEGION->legion_nodes[i][j].y = OHIO_LEGION->Rand_Range(0, 1);
+	      OHIO_LEGION->legion_nodes[i][j].x = OHIO_LEGION->Rand_Range(0, 1);
+              OHIO_LEGION->legion_nodes[i][j].y = OHIO_LEGION->Rand_Range(0, 1);
             }
         }
 
