@@ -47,6 +47,7 @@ double LEGION<Ex,In,Zp>::Sigma_Inf()
 }
 
 
+
 template <class Ex, class In, class Zp>
 LEGION<Ex,In,Zp>::LEGION(int N)
 {
@@ -172,16 +173,16 @@ void LEGION<Ex,In,Zp>::Iteration(double h)
 
 
 template <class Ex, class In,class Zp>
-    double LEGION<Ex,In,Zp>::Max_X_Grid(Node ** a)
+    double LEGION<Ex,In,Zp>::Max_X_Grid()
     {
-        double max = a[1][1].x;
+        double max = legion_nodes[1][1].x;
         for (int i = 1; i <=N; i++)
         {
             for (int j = 1; j <=N; j++)
             {
-                if (a[i][j].x > max)
+                if (legion_nodes[i][j].x > max)
                 {
-                    max = a[i][j].x;
+                    max = legion_nodes[i][j].x;
                 }
             }
         }
@@ -200,16 +201,16 @@ void LEGION<Ex,In,Zp>::Reset(double x1,double x2, double x3, double x4)
 }
 
 template <class Ex, class In,class Zp>
-    double LEGION<Ex,In,Zp>::Min_X_Grid(Node ** a)
+double LEGION<Ex,In,Zp>::Min_X_Grid()
     {
-        double min = a[1][1].x;
+        double min = legion_nodes[1][1].x;
         for (int i = 1; i <=N; i++)
         {
             for (int j = 1; j <=N; j++)
             {
-                if (a[i][j].x < min)
+                if (legion_nodes[i][j].x < min)
                 {
-                    min = a[i][j].x;
+                    min = legion_nodes[i][j].x;
                 }
             }
         }
