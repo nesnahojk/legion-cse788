@@ -1,4 +1,4 @@
-//One iteration of the Runge kutta method
+//Runge kutta method for differential equations
 template <class Ex, class In, class Zp>
 void LEGION<Ex,In,Zp>::Runge_Kutta(double x1, double y1, double &x2, double &y2, double input, double h)
     {
@@ -48,8 +48,9 @@ double LEGION<Ex,In,Zp>::Sigma_Inf()
 
 
 template <class Ex, class In, class Zp>
-LEGION<Ex,In,Zp>::LEGION()
+LEGION<Ex,In,Zp>::LEGION(int N)
 {
+    this->N=N;
     z = 0.0;
     legion_nodes = new Node*[N + 2]; //pad the array for easier calcs on border
     for (int i = 0; i < (N + 2); i++)
