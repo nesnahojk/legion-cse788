@@ -74,16 +74,16 @@ class LEGION
 
 public:
  double z;
- static const int N = 20;
  Node ** legion_nodes;
  void Init_Weights(double, double);
- LEGION();
+ LEGION(int);
 ~LEGION();
  void Iteration(double);
  double Max_X_Grid(Node ** a);
  double Min_X_Grid(Node ** a);
  double Rand_Range(double a, double b);
  void Reset(double,double,double,double);
+ int N;
  
 private:
  static const double K = 50.0;
@@ -91,6 +91,7 @@ private:
  static const double theta_zx = .1;
  static const double theta_xz = .1;
  static const double rho = .02;
+
 
  Ex ff;
  In gg;
