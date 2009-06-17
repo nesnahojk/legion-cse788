@@ -156,6 +156,8 @@ int main(int argc, char *argv[]) {
     glutIdleFunc(loop);
     glutMainLoop();
 
+
+    delete(OHIO_LEGION);
     return (0);
 
 }
