@@ -1,4 +1,7 @@
-legion.o: LEGION.h legion_glut.cpp
-	g++ LEGION.h legion_glut.cpp -lglut -o legion.o
+CXXFLAGS = -lglut -Wall -pedantic -ansi
+
+legion_glut: LEGION.h legion_glut.cpp LEGION.impl
+	$(CXX) $(CXXFLAGS)  legion_glut.cpp -o legion_glut
+
 clean:
-	rm legion.o
+	$(RM) legion_glut

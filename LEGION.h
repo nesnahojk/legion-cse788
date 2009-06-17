@@ -15,12 +15,10 @@
 
 class Z_Prime
 {
- private:
-  static const double phi = 3.0;
  public:
   double operator ()(double x, double input)
   {
-    return (phi * (input - x));
+    return (3.0 * (input - x));
   }
 };
 
@@ -37,14 +35,10 @@ class ExcitatoryUnit
 
 class InhibitoryUnit
 {
- private:
-  static const double beta = .1;
-  static const double eps = .02;
-  static const double gam = 6.0;
  public:
   double operator()(double x, double y)
   {
-    return eps * (gam * (1 + tanh(x / beta)) - y);
+    return .02 * (6.0 * (1 + tanh(x / .1)) - y);
   }
 };
 
@@ -77,6 +71,7 @@ public:
  Node ** legion_nodes;
  void Init_Weights(double, double);
  LEGION(int); 
+ LEGION(int,double,double,double,double,double); 
 ~LEGION();
  void Iteration(double);
  double Max_X_Grid();
@@ -86,11 +81,11 @@ public:
  int N;
  
 private:
- static const double K = 50.0;
- static const double theta_x = .5;
- static const double theta_zx = .1;
- static const double theta_xz = .1;
- static const double rho = .02;
+ double K;
+ double theta_x;
+ double theta_zx;
+ double theta_xz;
+ double rho;
 
 
  Ex ff;
@@ -98,6 +93,7 @@ private:
  Zp zz;
 
  double S_Inf(double x, double theta);
+ void Init_Nodes();
  double Gauss_Noise();
  double Sigma_Inf();
  void Runge_Kutta(double x1, double y1, double &x2, double &y2, double input, double h);
