@@ -115,13 +115,10 @@ int main(int argc, char *argv[]) {
     getline(cin,s);
 
 
-    OHIO_LEGION=new LEGION<>(atoi(s.c_str()));
-
-    
+    OHIO_LEGION=new LEGION<>(atoi(s.c_str()));    
 
 
     if (getline(cin, s) != NULL) {
-    cout<<s<<endl;
         for (int i = 1; i <= OHIO_LEGION->N; i++) {
             for (int j = 1; j <= OHIO_LEGION->N; j++) {
                 //take the input from stdin and put into legion inputs
