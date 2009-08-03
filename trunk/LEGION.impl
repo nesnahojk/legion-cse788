@@ -28,6 +28,16 @@ LEGION<Ex,In,Zp>::LEGION(int N,double K,double theta_x, double theta_zx,double t
 }
 
 
+template <class Ex, class In,class Zp>
+LEGION<Ex,In,Zp>::~LEGION()
+{
+    for (int i = 0; i < (N + 2); i++)
+    {
+      free(legion_nodes[i]);  
+    }  
+    free(legion_nodes);
+}
+
 
 template <class Ex,class In,class Zp>
 void LEGION<Ex,In,Zp>::Init_Nodes()
@@ -251,13 +261,5 @@ double LEGION<Ex,In,Zp>::Min_X_Grid()
 
 
 
-template <class Ex, class In,class Zp>
-LEGION<Ex,In,Zp>::~LEGION()
-{
-    for (int i = 0; i < (N + 2); i++)
-    {
-      free(legion_nodes[i]);  
-    }  
-    free(legion_nodes);
-}
+
 
