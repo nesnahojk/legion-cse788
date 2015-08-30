@@ -1,0 +1,1 @@
+Locally Excitatory Globally Inhibitory Oscillator Networks -- Wang and Terman 1995
